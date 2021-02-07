@@ -1,8 +1,4 @@
-Proyecto API Python/Flask para Transcoding Radios RTVE a RTMP/IceCast
-
-Despliegue: AWS Irlanda (10.40.80.157 / 34.252.196.10) con la APK de titania. Usuario ubuntu, pero luego hay que entrar en ovesrt / OVE!admin 
-            EC2 -> Test Radios RTVE -> m5n.2xlarge
-            Security Group -> sg-03eadfddd19b9581f (SRT_API)
+Proyecto API Python/Flask para Transcoding Radio streams a RTMP/IceCast
 
 - Endpoints reciben y envían JSON para la configuración o las respuestas de la API: 
     - getAllRadios: Te muestra todas las radios configuradas.
@@ -40,8 +36,8 @@ Despliegue: AWS Irlanda (10.40.80.157 / 34.252.196.10) con la APK de titania. Us
         "ServerIp": "10.40.80.157",
         "ServerPort": "8000",
         "ServerFolder": "",
-        "ServerUser": "test_rne",
-        "ServerPassword": "OVE!admin"
+        "ServerUser": "user",
+        "ServerPassword": "password"
         }
         ```
         
@@ -101,7 +97,7 @@ Despliegue: AWS Irlanda (10.40.80.157 / 34.252.196.10) con la APK de titania. Us
     - "ServerPassword": ""                                                         -> Password para Icecast Server
 
 
-- Contenedores -> regsitry.overon.es/rtve_radios:v1 (dockerfile within project's folder) & regsitry.overon.es/bbdd_radios_api:v1 (dockerfile inside mariadb folder)
+- Contenedores -> radios_api:v1 (dockerfile within project's folder) & regsitry.overon.es/bbdd_radios_api:v1 (dockerfile inside mariadb folder)
 
     - API: contenedor de Python para ejecutar el código de la API. Usa el puerto TCP 4000 para recibir peticiones.
     - BBDD: base de datos MariaDB (SQL) para guardar los parámetros de cada radio. Puerto TCP 3306
@@ -117,7 +113,7 @@ Despliegue: AWS Irlanda (10.40.80.157 / 34.252.196.10) con la APK de titania. Us
 
     services:
     api:
-        image: regsitry.overon.es/rtve_radios:v1
+        image: radios_api:v1
         container_name: radios_api
         restart: always
         ports:
@@ -127,14 +123,14 @@ Despliegue: AWS Irlanda (10.40.80.157 / 34.252.196.10) con la APK de titania. Us
         links:
         - bbdd
     bbdd:
-        image: regsitry.overon.es/bbdd_radios_api:v1
+        image: bbdd_radios_api:v1
         container_name: radios_ddbb
         restart: always
         environment:
         - MYSQL_DATABASE=radios
-        - MYSQL_ROOT_PASSWORD=mysql_p3dx
-        - MYSQL_USER=raul
-        - MYSQL_PASSWORD=rauldb
+        - MYSQL_ROOT_PASSWORD=root_password
+        - MYSQL_USER=user
+        - MYSQL_PASSWORD=pass
         volumes:
         - bbdd:/var/lib/mysql
         ports:
@@ -163,8 +159,8 @@ Despliegue: AWS Irlanda (10.40.80.157 / 34.252.196.10) con la APK de titania. Us
         container_name: icecast_server
         restart: on-failure
         environment:
-        - ICECAST_SOURCE_PASSWORD=test_rne
-        - ICECAST_ADMIN_PASSWORD=OVE!admin
+        - ICECAST_SOURCE_PASSWORD=source_password
+        - ICECAST_ADMIN_PASSWORD=admin_password
         - ICECAST_PASSWORD=admin_pass
         - ICECAST_RELAY_PASSWORD=relay_pass
         - ICECAST_HOSTNAME=10.40.80.157
