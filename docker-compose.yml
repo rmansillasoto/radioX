@@ -1,0 +1,75 @@
+version: "3"
+
+services:
+  api:
+    image: regsitry.overon.es/rtve_radios:v1
+    container_name: radios_api
+    restart: always
+    ports:
+      - 4000:4000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    links:
+      - bbdd
+  bbdd:
+    image: regsitry.overon.es/bbdd_radios_api:v1
+    container_name: radios_ddbb
+    restart: always
+    environment:
+      - MYSQL_DATABASE=radios
+      - MYSQL_ROOT_PASSWORD=mysql_p3dx
+      - MYSQL_USER=raul
+      - MYSQL_PASSWORD=rauldb
+    volumes:
+      - bbdd:/var/lib/mysql
+    ports:
+      - 3306:3306
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmydmin
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=bbdd
+    depends_on:
+      - bbdd
+
+ nginx_rtmp:
+    image: tiangolo/nginx-rtmp
+    container_name: rtmp_server
+    restart: on-failure
+    ports:
+      - 1935:1935
+
+  icecast:
+     image: moul/icecast
+     container_name: icecast_server
+     restart: on-failure
+     environment:
+       - ICECAST_SOURCE_PASSWORD=test_rne
+       - ICECAST_ADMIN_PASSWORD=OVE!admin
+       - ICECAST_PASSWORD=admin_pass
+       - ICECAST_RELAY_PASSWORD=relay_pass
+       - ICECAST_HOSTNAME=10.40.80.157
+     volumes:
+       - logs:/var/log/icecast2
+       - /etc/localtime:/etc/localtime:ro
+     ports:
+      - 8000:8000
+
+  portainer:
+    image: portainer/portainer-ce
+    container_name: portainer
+    restart: on-failure
+    ports:
+      - 9000:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+volumes:
+ bbdd:
+ portainer_data:
+ logs:

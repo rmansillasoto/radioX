@@ -1,0 +1,8 @@
+flask
+flask-mysqldb
+flask_jwt_simple
+docker
+pyopenssl
+
+
+
