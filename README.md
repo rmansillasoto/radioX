@@ -1,4 +1,6 @@
-Proyecto API Python/Flask para Transcoding Radio streams a RTMP/IceCast
+# Proyecto API Python/Flask para Transcoding Radio streams a RTMP/IceCast
+
+[![License: MPL 2.0](https://img.shields.io/badge/License-MPL_2.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 
 - Endpoints reciben y envían JSON para la configuración o las respuestas de la API: 
     - getAllRadios: Te muestra todas las radios configuradas.
